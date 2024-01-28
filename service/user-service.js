@@ -25,12 +25,30 @@ class UserService {
         return {...tokens, user: userDto}
     }
 
-    async activate(activationCode) {
-        const user = await UserModel.findOne({activationCode})
-        if (!user) {
+    async activate(userId, activationCode) {
+        const user = await UserModel.findById(userId)
+        if (user.isActivated) {
+            throw ApiError.BadRequest('Пользователь уже активирован');
+        }
+        if (user.activationCode !== activationCode) {
             throw ApiError.BadRequest('Неккоректный код активации')
         }
         user.isActivated = true;
+        user.set({ activationCode: undefined })
+        await user.save();
+    }
+
+    async resendCode(userId) {
+        const user = await UserModel.findById(userId)
+        if (!user) {
+            throw ApiError.BadRequest('Пользователь не найден')
+        }
+        if (user.isActivated) {
+            throw ApiError.BadRequest('Пользователь уже активирован');
+        }
+        const activationCode = generateFourDigitCode();
+        await mailService.sendActivationMail(user.email, activationCode).catch(console.error);
+        user.activationCode = activationCode;
         await user.save();
     }
 
@@ -70,11 +88,6 @@ class UserService {
 
         await tokenService.saveToken(userDto.id, tokens.refreshToken);
         return {...tokens, user: userDto}
-    }
-
-    async getAllUsers() {
-        const users = await UserModel.find();
-        return users;
     }
 }
 
