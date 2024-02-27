@@ -1,7 +1,6 @@
 const nodemailer = require('nodemailer');
 
 class MailService {
-
     constructor() {
         this.transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST,
@@ -14,17 +13,39 @@ class MailService {
         })
     }
 
-    async sendActivationMail(to, link) {
+    async sendActivationMail(to, code) {
         await this.transporter.sendMail({
             from: process.env.SMTP_USER,
             to,
-            subject: 'Активация аккаунта на ' + process.env.API_URL,
+            subject: 'Активация аккаунта Fit Well Hub',
             text: '',
             html:
                 `
+                    <style>
+                        div {
+                            font-family: 'Arial', sans-serif;
+                            background-color: #f4f4f4;
+                            border-radius: 8px;
+                            padding: 20px;
+                            text-align: center;
+                            width: 300px;
+                            margin: 0 auto;
+                            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                        }
+                    
+                        h1 {
+                            color: #333;
+                        }
+                    
+                        p {
+                            color: #555;
+                            font-size: 18px;
+                            margin-top: 10px;
+                        }
+                    </style>
                     <div>
-                        <h1>Для активации перейдите по ссылке</h1>
-                        <a href="${link}">${link}</a>
+                        <h1>Код подтверждения регистрации</h1>
+                        <p>${code}</p>
                     </div>
                 `
         })
