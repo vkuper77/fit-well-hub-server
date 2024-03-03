@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const router = require('./router/index')
 const errorMiddleware = require('./middlewares/error-middleware');
 
+let URL_DB;
 const PORT = process.env.PORT || 3000;
 const app = express()
 
@@ -15,9 +16,17 @@ app.use(cors({ credentials: true }));
 app.use('/api', router);
 app.use(errorMiddleware);
 
+if (process.env.NODE_ENV === undefined || process.env.NODE_ENV === 'development') {
+    URL_DB = process.env.DEV_DB_URL;
+}
+
+if (process.env.NODE_ENV === 'production') {
+    URL_DB = process.env.DB_URL;
+}
+
 const start = async () => {
     try {
-        await mongoose.connect(process.env.DB_URL, {
+        await mongoose.connect(URL_DB, {
             useNewUrlParser: true,
             useUnifiedTopology: true
         })
