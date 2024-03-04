@@ -57,12 +57,12 @@ class UserService {
         if (!user) {
             throw ApiError.BadRequest('Пользователь не найден')
         }
-        const isPassEquals = await bcrypt.compare(password, user.password);
+        const isPassEquals = await bcrypt.compare(password, user.password)
         if (!isPassEquals) {
-            throw ApiError.BadRequest('Неверный пароль');
+            throw ApiError.BadRequest('Неверный пароль')
         }
-        const userDto = new UserDto(user);
-        const tokens = tokenService.generateTokens({...userDto});
+        const userDto = new UserDto(user)
+        const tokens = tokenService.generateTokens({...userDto})
 
         await tokenService.saveToken(userDto.id, tokens.refreshToken);
         return {...tokens, user: userDto}
@@ -71,6 +71,23 @@ class UserService {
     async logout(refreshToken) {
         const token = await tokenService.removeToken(refreshToken);
         return token;
+    }
+
+    async changePassword(email, password) {
+        const user = await UserModel.findOne({ email })
+
+        if (!user) {
+            throw ApiError.BadRequest('Пользователь не найден')
+        }
+
+        const hashPassword = await bcrypt.hash(password, 3)
+
+        if(hashPassword) {
+            user.password = hashPassword
+            return user.save()
+        } else {
+            throw ApiError.BadRequest('Ошибка при валидации')
+        }
     }
 
     async refresh(refreshToken) {
