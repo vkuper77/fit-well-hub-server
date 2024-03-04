@@ -13,7 +13,7 @@ router.post('/registration',
 router.post('/login', userController.login);
 router.post('/logout', authMiddleware, userController.logout);
 router.post('/activate', authMiddleware, userController.activate);
-router.post('/resendCode', authMiddleware, userController.resendCode);
+router.post('/registerCode', authMiddleware, userController.registerCode);
 router.post('/sendCode', userController.sendCode);
 router.post('/validateCode', userController.validateCode);
 router.post('/changePassword', userController.changePassword);

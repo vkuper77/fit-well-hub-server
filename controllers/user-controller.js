@@ -73,10 +73,10 @@ class UserController {
         }
     }
 
-    async resendCode(req, res, next) {
+    async registerCode(req, res, next) {
         try {
             const { id } = req.user
-            await userService.resendCode(id)
+            await userService.registerCode(id)
             return res.json({ success: true })
         } catch (e) {
             next(e)

@@ -38,7 +38,7 @@ class UserService {
         await user.save();
     }
 
-    async resendCode(userId) {
+    async registerCode(userId) {
         const user = await UserModel.findById(userId)
         if (!user) {
             throw ApiError.BadRequest('Пользователь не найден')
