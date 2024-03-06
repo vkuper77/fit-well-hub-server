@@ -3,6 +3,7 @@ const CodeModel = require("../models/code-model")
 const ApiError = require("../exceptions/api-error")
 const {generateFourDigitCode} = require("../utils/generate-four-digit-code")
 const mailService = require("./mail-service")
+const tokenService = require("./token-service");
 
 class CodeService {
     async sendCode(email) {
@@ -19,10 +20,12 @@ class CodeService {
 
         if(codeData) {
             codeData.code = activationCode
-            return codeData.save()
+            codeData.save()
+        } else {
+            await CodeModel.create({ code: activationCode, email })
         }
 
-        await CodeModel.create({ code: activationCode, email })
+        return tokenService.generateShortToken({ email })
     }
 
     async validateCode(email, code) {
