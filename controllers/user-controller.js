@@ -56,8 +56,8 @@ class UserController {
     async sendCode(req, res, next) {
         try {
             const { email } = req.body
-            await codeService.sendCode(email)
-            return res.json({ success: true })
+            const data = await codeService.sendCode(email)
+            return res.json({ success: true, ...data })
         } catch (e) {
             next(e)
         }
@@ -65,7 +65,8 @@ class UserController {
 
     async changePassword(req, res, next) {
         try {
-            const { email, password } = req.body
+            const { password } = req.body
+            const { email } = req.user
             await userService.changePassword(email, password)
             return res.json({ success: true })
         } catch (e) {
@@ -85,7 +86,8 @@ class UserController {
 
     async validateCode(req, res, next) {
         try {
-            const { email, code } = req.body
+            const { code } = req.body
+            const { email } = req.user
             await codeService.validateCode(email, code)
             return res.json({ success: true })
         } catch (e) {
